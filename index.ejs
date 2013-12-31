@@ -19,12 +19,13 @@
 <script>
 	$('#newRoom').on('click', function(event){
 		var roomName = $('#roomNameInput').val();
-		$('#roomCreated').html('<h4><a href="http://ourtubes.herokuapp.com/room/'+ roomName +'"' + '>Room Successfully created, click here to access</a></h4>');
-		$.get(('http://ourtubes.herokuapp.com/newRoom/' + roomName), function(response){
+//		$('#roomCreated').html('<h4><a href="http://ourtubes.herokuapp.com/room/'+ roomName +'"' + '>Room Successfully created, click here to access</a></h4>');
+		//$.get(('http://ourtubes.herokuapp.com/newRoom/' + roomName), function(response){
+		$.get(('http://localhost:3000/newRoom/' + roomName), function(response){
 			if(response == 'ERROR ROOM DUPLICATE'){
-//				alert('sorry, room name already exists');
+				$('#roomCreated').html('<h4><a href="http://localhost:3000/room/'+ roomName +'"' + '>Room Successfully already exists at http://localhost:3000/room/' + roomName + '</a></h4>').slideDown();
 			}else{
-//				alert('done');
+				$('#roomCreated').html('<h4><a href="http://localhost:3000/room/'+ roomName +'"' + '>Room Successfully created at http://localhost:3000/room/' + roomName + '</a></h4>').slideDown();
 //				window.location.replace("http://ourtubes.herokuapp.com/room/" + roomName);
 //				window.location.replace("http://localhost:3000/room/" + roomName);
 			}

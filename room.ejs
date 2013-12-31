@@ -44,7 +44,8 @@
     }
 
 	var youtubeIds = [];
-	var socket = io.connect('http://ourtubes.herokuapp.com');
+//	var socket = io.connect('http://ourtubes.herokuapp.com');
+	var socket = io.connect('http://localhost:3000');
 	var roomName = $("#room-title").text();
 	var nickname;
 	//var nickname = prompt('Nickname please:', nickname);
@@ -59,10 +60,9 @@
 			$('#urlList').append($('<li data-url=' + url +'>' + url + "</li>"));
 			youtubeIds.push(getYoutubeId(url));
 		});
-		$('#urlList').children().first().remove();
-		$('#nowPlaying').text('http://www.youtube.com/watch?v=' + youtubeIds[0]);
-		player.loadVideoById(youtubeIds[0]);
-		youtubeIds.splice(0, 1);
+		if(!urls.empty()){
+			nextVideo();
+		}
 	});
 	socket.on('names', function(names){
 		names.forEach(function(name){

@@ -8,6 +8,7 @@
 		"ejs": "*",
 		"socket.io":"*",
 		"sys":"*",
-		"path": "*"
+		"path": "*",
+		"redis": "*"
 	}
 }
