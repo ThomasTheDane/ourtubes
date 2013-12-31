@@ -8,8 +8,8 @@ app.use("/scripts", express.static(__dirname + "/scripts"));
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
 var sys = require('sys');
-
-server.listen(3000);
+var port = process.env.PORT || 3000;
+server.listen(port);
 
 var roomQueues = {};
 var roomNames = {};
