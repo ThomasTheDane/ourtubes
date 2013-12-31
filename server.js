@@ -22,7 +22,7 @@ app.get('/', function (req, res){
 app.get('/room/:roomName', function (req, res){
 	var roomName = req.params.roomName.toLowerCase();
 	sys.log('showign room: ' + roomName);
-	if(roomNames in roomQueues){
+	if(roomNames.hasOwnProperty(roomName)){
 		res.render(__dirname + '/room.ejs', {roomName: roomName});
 	}else{
 		res.render(__dirname + '/noRoom.ejs', {});
