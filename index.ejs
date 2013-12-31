@@ -3,7 +3,7 @@
 <div class="container">
 	<form class="room-form">
 		<h1>Welcome to OurTube</h1>
-		<p class="lead">To start a room, enter the room name and hit the button</p>
+		<p class="lead">To start or join a room, enter the room name and hit the button</p>
 		<input type="text" id="roomNameInput" class="room-form" placeholder="Room Name" required="" autofocus="">
 		<button id="newRoom" type="button" class="btn btn-lg btn-success">Start</button>
 		<div id="roomCreated" class="room-form"></div>
@@ -18,11 +18,9 @@
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="styles/bootstrap/js/bootstrap.min.js"></script>
 <script>
-
-
 	$('#newRoom').on('click', function(event){
 		var roomName = $('#roomNameInput').val();
-		$('#roomCreated').html('<a href="http://ourtubes.herokuapp.com/room/'+ roomName +'"' + '>Room Successfully created, click here to access</a>');
+		$('#roomCreated').html('<h4><a href="http://ourtubes.herokuapp.com/room/'+ roomName +'"' + '>Room Successfully created, click here to access</a></h4>');
 		$.get(('http://ourtubes.herokuapp.com/newRoom/' + roomName), function(response){
 			if(response == 'ERROR ROOM DUPLICATE'){
 //				alert('sorry, room name already exists');
