@@ -6,8 +6,7 @@
 		<p class="lead">To start a room, enter the room name and hit the button</p>
 		<input type="text" id="roomNameInput" class="room-form" placeholder="Room Name" required="" autofocus="">
 		<button id="newRoom" type="button" class="btn btn-lg btn-success">Start</button>
-		<div id="roomCreated"></div>
-		<br>
+		<div id="roomCreated" class="room-form"></div>
 		<h2>Instructions:</h2>
 		<p>You can create rooms by the above form</p>
 		<p>After a room has been created, anyone in the world can access it by going to:</p>
@@ -19,6 +18,8 @@
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="styles/bootstrap/js/bootstrap.min.js"></script>
 <script>
+
+
 	$('#newRoom').on('click', function(event){
 		var roomName = $('#roomNameInput').val();
 		$.get(('http://http://ourtubes.herokuapp.com/newRoom/' + roomName), function(response){
@@ -26,7 +27,7 @@
 				alert('sorry, room name already exists');
 			}else{
 				alert('done');
-				$('#roomCreated').html('<a href="http://ourtubes.herokuapp.com/room/'+ roomName +'"' + '>Link text</a>');
+				$('#roomCreated').html('<a href="http://ourtubes.herokuapp.com/room/'+ roomName +'"' + '>Room Successfully created, click here to access</a>');
 //				window.location.replace("http://ourtubes.herokuapp.com/room/" + roomName);
 //				window.location.replace("http://localhost:3000/room/" + roomName);
 			}
