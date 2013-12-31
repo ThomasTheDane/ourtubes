@@ -13,11 +13,11 @@
 <script>
 	$('#newRoom').on('click', function(event){
 		var roomName = $('#roomNameInput').val();
-		$.get(('http://localhost:3000/newRoom/' + roomName), function(response){
+		$.get(('http://http://ourtubes.herokuapp.com/newRoom/' + roomName), function(response){
 			if(response == 'ERROR ROOM DUPLICATE'){
 				alert('sorry, room name already exists');
 			}else{
-				window.location.replace("http://localhost:3000/room/" + roomName);
+				window.location.replace("http://http://ourtubes.herokuapp.com/room/" + roomName);
 //				window.location.replace("http://localhost:3000/room/" + roomName);
 			}
 		})
