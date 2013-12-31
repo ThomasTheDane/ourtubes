@@ -22,12 +22,12 @@
 
 	$('#newRoom').on('click', function(event){
 		var roomName = $('#roomNameInput').val();
+		$('#roomCreated').html('<a href="http://ourtubes.herokuapp.com/room/'+ roomName +'"' + '>Room Successfully created, click here to access</a>');
 		$.get(('http://http://ourtubes.herokuapp.com/newRoom/' + roomName), function(response){
 			if(response == 'ERROR ROOM DUPLICATE'){
-				alert('sorry, room name already exists');
+//				alert('sorry, room name already exists');
 			}else{
-				alert('done');
-				$('#roomCreated').html('<a href="http://ourtubes.herokuapp.com/room/'+ roomName +'"' + '>Room Successfully created, click here to access</a>');
+//				alert('done');
 //				window.location.replace("http://ourtubes.herokuapp.com/room/" + roomName);
 //				window.location.replace("http://localhost:3000/room/" + roomName);
 			}
