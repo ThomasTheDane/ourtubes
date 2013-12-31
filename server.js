@@ -39,6 +39,7 @@ app.get('/newRoom/:roomName', function (req, res){
 });
 
 io.sockets.on('connection', function (socket) {
+	sys.log('connection made');
 	socket.on('join', function(data){
 		var nickname = data.nickname;
 		var roomName = data.roomName.toLowerCase();
