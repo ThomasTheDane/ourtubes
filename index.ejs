@@ -3,15 +3,15 @@
 <div class="container">
 	<form class="room-form">
 		<h1>Welcome to OurTube</h1>
-		<p class="lead">To start or join a room, enter the room name and hit the button</p>
+		<p class="lead">To join a room, enter the room name and hit the button</p>
 		<input type="text" id="roomNameInput" class="room-form" placeholder="Room Name" required="" autofocus="">
-		<button id="newRoom" type="button" class="btn btn-lg btn-success">Start</button>
+		<button id="newRoom" type="button" class="btn btn-lg btn-success">Join</button>
 		<div id="roomCreated" class="room-form"></div>
 		<h2>Instructions:</h2>
-		<p>You can create rooms by the above form</p>
-		<p>After a room has been created, anyone in the world can access it by going to:</p>
+		<p>You can go to any room by simply accessing:</p>
 		<p>Ourtubes.herokuapp.com/room/(room name)</p>
 		<p>Anyone in the room can add youtube urls to the queue and push that url to the bottom of everyone in that room's queue </p>
+		<p>Type in the room name and hit Join to access room</p>
 	</form>
 </div>
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
@@ -19,16 +19,17 @@
 <script>
 	$('#newRoom').on('click', function(event){
 		var roomName = $('#roomNameInput').val();
+		window.location.replace("http://localhost:3000/room/" + roomName);
 //		$('#roomCreated').html('<h4><a href="http://ourtubes.herokuapp.com/room/'+ roomName +'"' + '>Room Successfully created, click here to access</a></h4>');
-		//$.get(('http://ourtubes.herokuapp.com/newRoom/' + roomName), function(response){
-		$.get(('http://localhost:3000/newRoom/' + roomName), function(response){
-			if(response == 'ERROR ROOM DUPLICATE'){
-				$('#roomCreated').html('<h4><a href="http://localhost:3000/room/'+ roomName +'"' + '>Room Successfully already exists at http://localhost:3000/room/' + roomName + '</a></h4>').slideDown();
-			}else{
-				$('#roomCreated').html('<h4><a href="http://localhost:3000/room/'+ roomName +'"' + '>Room Successfully created at http://localhost:3000/room/' + roomName + '</a></h4>').slideDown();
+//		$.get(('http://ourtubes.herokuapp.com/newRoom/' + roomName), function(response){
+//		$.get(('http://localhost:3000/newRoom/' + roomName), function(response){
+//			if(response == 'ERROR ROOM DUPLICATE'){
+//				$('#roomCreated').html('<h4><a href="http://localhost:3000/room/'+ roomName +'"' + '>Room Successfully already exists at http://localhost:3000/room/' + roomName + '</a></h4>').slideDown();
+//			}else{
+//				$('#roomCreated').html('<h4><a href="http://localhost:3000/room/'+ roomName +'"' + '>Room Successfully created at http://localhost:3000/room/' + roomName + '</a></h4>').slideDown();
 //				window.location.replace("http://ourtubes.herokuapp.com/room/" + roomName);
 //				window.location.replace("http://localhost:3000/room/" + roomName);
-			}
-		})
+//			}
+//		})
 	});
 </script>

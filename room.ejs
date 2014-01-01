@@ -28,6 +28,8 @@
 <script src="http://www.youtube.com/player_api"></script>
 
 <script>
+	//when ids come in when room is joined, I need to do api call for each, but do so after everything else is displayed in non-blocking
+	//I want to replace the urls with the actual name
 	// create youtube player
     var player;
     function onYouTubePlayerAPIReady() {
@@ -49,42 +51,68 @@
 	var roomName = $("#room-title").text();
 	var nickname;
 	//var nickname = prompt('Nickname please:', nickname);
-	if(nickname == ""){
-		nickname = "Some Dude";
-	}
+//	if(nickname == ""){
+	nickname = "Some Dude";
+//	}
 
 	//when join emit name and room to get back urls and name
 	socket.emit('join', {nickname: nickname, roomName: roomName});
 	socket.on('urls', function(urls){
 		urls.forEach(function(url){
-			$('#urlList').append($('<li data-url=' + url +'>' + url + "</li>"));
-			youtubeIds.push(getYoutubeId(url));
-		});
-		if(!urls.empty()){
-			nextVideo();
-		}
-	});
-	socket.on('names', function(names){
-		names.forEach(function(name){
-			$('#membersList').append($('<li data-name=' + name + '>' + name + "</li>"));
+			$.get('http://gdata.youtube.com/feeds/api/videos/' + url, function (reply, status){
+				var title = $(reply).find('title').text();
+				title = title.substring(0, title.length/2);
+				$('#urlList').append($('<li data-url=' + url +'>' + title + "</li>"));
+				youtubeIds.push(url);
+			});
 		});
 	});
-	socket.on('addName', function(name){
-		$('#membersList').append($('<li data-name=' + name + '>' + name + "</li>"));
-	});
-	socket.on('removeName', function(name){
-		$('#membersList li[data-name=' + name + ']').remove();
-	});
+//	socket.on('names', function(names){
+//		names.forEach(function(name){
+//			$('#membersList').append($('<li data-name=' + name + '>' + name + "</li>"));
+//		});
+//	});
+//	socket.on('addName', function(name){
+//		$('#membersList').append($('<li data-name=' + name + '>' + name + "</li>"));
+//	});
+//	socket.on('removeName', function(name){
+//		$('#membersList li[data-name=' + name + ']').remove();
+//	});
 	socket.on('addUrl', function(url){
-		$('#urlList').append($('<li data-url=' + url +'>' + url + "</li>"));
-		youtubeIds.push(getYoutubeId(url));
+		$.get('http://gdata.youtube.com/feeds/api/videos/' + url, function (reply, status){
+			var title = $(reply).find('title').text();
+			title = title.substring(0, title.length/2);
+			$('#urlList').append($('<li data-url=' + url +'>' + title + "</li>"));
+			youtubeIds.push(url);
+		});
 	});
 	$("#submit-url-button").on('click', function(e){
-		var url = $("input").val();
-		$('input').val('');
-		socket.emit('addUrl', {roomName:roomName, url:url});
-		$('#urlList').append($('<li data-url=' + url +'>' + url + "</li>"));
-		youtubeIds.push(getYoutubeId(url));
+		var url = getYoutubeId($("input").val());
+		$.ajax({
+			url: 'http://gdata.youtube.com/feeds/api/videos/' + url,
+			type: 'GET',
+			success: function(reply){
+				var title = $(reply).find('title').text();
+				title = title.substring(0, title.length/2);
+				$('input').val('');
+				socket.emit('addUrl', {roomName:roomName, url:url});
+				$('#urlList').append($('<li data-url=' + url +'>' + title + "</li>"));
+				youtubeIds.push(url);
+			},
+			error: function(data){
+				alert('Does not appear to be valid youtube video');
+			}
+		})
+		/*
+		$.get('http://gdata.youtube.com/feeds/api/videos/' + url, function (reply, status){
+			var title = $(reply).find('title').text();
+			title = title.substring(0, title.length/2);
+			$('input').val('');
+			socket.emit('addUrl', {roomName:roomName, url:url});
+			$('#urlList').append($('<li data-url=' + url +'>' + url + "</li>"));
+			youtubeIds.push(url);
+		});
+		*/
 	});
 	$('#nextVideoButton').on('click', nextVideo);
 
@@ -102,12 +130,16 @@
     function nextVideo(){
 		if(youtubeIds.length > 0){
 			$('#urlList').children().first().remove();
-			$('#nowPlaying').text('http://www.youtube.com/watch?v=' + youtubeIds[0]);
+			var url = youtubeIds[0]
 			player.loadVideoById(youtubeIds[0]);
 			youtubeIds.splice(0, 1);
+			$.get('http://gdata.youtube.com/feeds/api/videos/' + url, function (reply, status){
+				var title = $(reply).find('title').text();
+				title = title.substring(0, title.length/2);
+				$('#nowPlaying').text(title);
+			});
 		}
-    }
-    function onPlayerError(event){
+    }    function onPlayerError(event){
     	nextVideo();
     }
     function getYoutubeId(url){

@@ -83,7 +83,8 @@ io.sockets.on('connection', function (socket) {
 		//socket.set('info', {nickname: nickname, roomName: roomName});
 		//sys.log(nickname + " just joined room " + roomName );
 		//roomNames[roomName].push(nickname);
-		redisClient.lrange(roomName, 0, -1, function (err, urls){
+		redisClient.lrange(roomName, 0, -2, function (err, urls){
+			urls = urls.reverse();
 			sys.log('sending urls: ' + urls);
 			socket.emit('urls', urls);
 		});
@@ -110,15 +111,25 @@ io.sockets.on('connection', function (socket) {
 	// });
 });
 
-function getUrls(room){
-	redisClient.lrange(room, 0, -1, function (err, urls){
-		return urls;
-	})
-}
+// function getUrls(room){
+// 	redisClient.lrange(room, 0, -1, function (err, urls){
+// 		return urls;
+// 	})
+// }
 
 function addUrl(url, room){
-	//roomQueues[room].push(url);
-	redisClient.lpush(room, url, function (err, reply){
-		sys.log('number of urls in list is now: ' + reply);
+	redisClient.exists(room, function (err, doesExist){
+		if(doesExist != 1){
+			var options = JSON.stringify({hasBeenSeen: true, size:'unset', autoplay:'unset', shuffle:'unset', repeat:'unset', password:''});
+			redisClient.lpush(room, options, function (err, response){
+				redisClient.lpush(room, url, function (err, reply){
+					sys.log('number of urls in list is now: ' + reply);
+				});
+			});
+		}else{
+			redisClient.lpush(room, url, function (err, reply){
+				sys.log('number of urls in list is now: ' + reply);
+			});
+		}
 	});
 }
