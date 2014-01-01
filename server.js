@@ -3,8 +3,7 @@ var app = express();
 var path = require('path');
 var redis = require('redis');
 var urlLib = require('url');
-//sys.log(process.env.REDISCLOUD_URL);
-var REDISCLOUD_URL = //mine only, sorry
+var REDISCLOUD_URL = 'redis://rediscloud:ICLd5rSYCUpLsGto@pub-redis-19940.us-east-1-2.2.ec2.garantiadata.com:19940'
 var redisURL = urlLib.parse(process.env.REDISCLOUD_URL || REDISCLOUD_URL);
 var redisClient = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});
 redisClient.auth(redisURL.auth.split(":")[1]);
@@ -20,10 +19,6 @@ server.listen(port);
 
 //var roomQueues = {};
 //var roomNames = {};
-
-redisClient.lpush('foober', 'dis', function (err, reply){
-	sys.log('number of urls in list is now: ' + reply);
-});
 
 app.get('/', function (req, res){
 	sys.log("showing / ");
