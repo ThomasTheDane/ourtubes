@@ -1,0 +1,149 @@
+<link rel="stylesheet" href="../styles/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="../styles/room.css">
+<script src="/socket.io/socket.io.js"></script>
+
+<div class="center container">
+	<h1 id="room-title"><%= roomName %></h1>
+	<div id="player"></div>
+	<form id="url-box">
+		<input id="url-box" type="text" placeholder="Youtube url" required="" autofocus="">
+		<button type="button" id="submit-url-button" class="btn btn-lg btn-success">Add</button>
+	</form>
+	<h3>Now Playing:</h3> <p id="nowPlaying"></p> 
+	<button type="button" id="nextVideoButton" class="btn btn-lg btn-success">Next Video</button>
+	<h1>Queue:</h1>
+	<ol id="urlList">
+
+	</ol>
+	<!--
+	<h1>Members</h1>	
+	<ul id="membersList">
+
+	</ul>
+	-->
+</div>
+
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="../styles/bootstrap/js/bootstrap.min.js"></script>
+<script src="http://www.youtube.com/player_api"></script>
+
+<script>
+	//when ids come in when room is joined, I need to do api call for each, but do so after everything else is displayed in non-blocking
+	//I want to replace the urls with the actual name
+	// create youtube player
+    var player;
+    function onYouTubePlayerAPIReady() {
+        player = new YT.Player('player', {
+          height: '390',
+          width: '640',
+          videoId: '',
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange,
+            'onError': onPlayerError
+          }
+        });
+    }
+
+	var youtubeIds = [];
+	var socket = io.connect('http://ourtubes.herokuapp.com');
+//	var socket = io.connect('http://localhost:3000');
+	var roomName = $("#room-title").text();
+	var nickname;
+	//var nickname = prompt('Nickname please:', nickname);
+//	if(nickname == ""){
+	nickname = "Some Dude";
+//	}
+
+	//when join emit name and room to get back urls and name
+	socket.emit('join', {nickname: nickname, roomName: roomName});
+	socket.on('urls', function(urls){
+		urls.forEach(function(url){
+			$.get('http://gdata.youtube.com/feeds/api/videos/' + url, function (reply, status){
+				var title = $(reply).find('title').text();
+				title = title.substring(0, title.length/2);
+				$('#urlList').append($('<li data-url=' + url +'>' + title + "</li>"));
+				youtubeIds.push(url);
+			});
+		});
+	});
+//	socket.on('names', function(names){
+//		names.forEach(function(name){
+//			$('#membersList').append($('<li data-name=' + name + '>' + name + "</li>"));
+//		});
+//	});
+//	socket.on('addName', function(name){
+//		$('#membersList').append($('<li data-name=' + name + '>' + name + "</li>"));
+//	});
+//	socket.on('removeName', function(name){
+//		$('#membersList li[data-name=' + name + ']').remove();
+//	});
+	socket.on('addUrl', function(url){
+		$.get('http://gdata.youtube.com/feeds/api/videos/' + url, function (reply, status){
+			var title = $(reply).find('title').text();
+			title = title.substring(0, title.length/2);
+			$('#urlList').append($('<li data-url=' + url +'>' + title + "</li>"));
+			youtubeIds.push(url);
+		});
+	});
+	$("#submit-url-button").on('click', function(e){
+		var url = getYoutubeId($("input").val());
+		$.ajax({
+			url: 'http://gdata.youtube.com/feeds/api/videos/' + url,
+			type: 'GET',
+			success: function(reply){
+				var title = $(reply).find('title').text();
+				title = title.substring(0, title.length/2);
+				$('input').val('');
+				socket.emit('addUrl', {roomName:roomName, url:url});
+				$('#urlList').append($('<li data-url=' + url +'>' + title + "</li>"));
+				youtubeIds.push(url);
+			},
+			error: function(data){
+				alert('Does not appear to be valid youtube video');
+			}
+		})
+		/*
+		$.get('http://gdata.youtube.com/feeds/api/videos/' + url, function (reply, status){
+			var title = $(reply).find('title').text();
+			title = title.substring(0, title.length/2);
+			$('input').val('');
+			socket.emit('addUrl', {roomName:roomName, url:url});
+			$('#urlList').append($('<li data-url=' + url +'>' + url + "</li>"));
+			youtubeIds.push(url);
+		});
+		*/
+	});
+	$('#nextVideoButton').on('click', nextVideo);
+
+    // autoplay video
+    function onPlayerReady(event) {
+        //event.target.playVideo();
+    }
+
+    // when video ends
+    function onPlayerStateChange(event) { 
+        if(event.data === 0) {
+			nextVideo();
+        }
+    }
+    function nextVideo(){
+		if(youtubeIds.length > 0){
+			$('#urlList').children().first().remove();
+			var url = youtubeIds[0]
+			player.loadVideoById(youtubeIds[0]);
+			youtubeIds.splice(0, 1);
+			$.get('http://gdata.youtube.com/feeds/api/videos/' + url, function (reply, status){
+				var title = $(reply).find('title').text();
+				title = title.substring(0, title.length/2);
+				$('#nowPlaying').text(title);
+			});
+		}
+    }    function onPlayerError(event){
+    	nextVideo();
+    }
+    function getYoutubeId(url){
+    	var indexOf = url.indexOf('?');
+    	return url.substring(indexOf+3);
+    }
+</script>
